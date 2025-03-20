@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA 메모장</title>
+    
+    <!-- PWA 설정 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007aff">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>PWA 메모장</h1>
+        <textarea id="memo" placeholder="메모를 입력하세요..."></textarea>
+        <button onclick="saveMemo()">저장</button>
+        <ul id="memoList"></ul>
+    </div>
+    
+<template id="memoTemplate">
+    <li>
+        <div class="memo_content"></div>
+        <div class="container_memolist">
+            <button class="btn_delete" data-id="">삭제</button>
+            <button class="btn_modify" data-id="">수정</button>
+        </div>
+    </li>
+</template>
+
+    <script>
+        console.log("✅ Service Worker 등록 시도 시작");
+
+        if ('serviceWorker' in navigator) {
+            console.log("✅ Service Worker 지원됨");
+
+            navigator.serviceWorker.register('/sw.js')
+                .then((registration) => {
+                    console.log("✅ Service Worker 등록 완료:", registration);
+                })
+                .catch(error => {
+                    console.error("❌ Service Worker 등록 실패:", error);
+                });
+        } else {
+            console.error("❌ Service Worker 미지원 환경");
+        }
+
+    </script>
+</body>
+</html>
