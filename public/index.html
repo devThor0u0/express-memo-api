@@ -17,16 +17,16 @@
     <div class="container">
         <h1>PWA 메모장</h1>
         <textarea id="memo" placeholder="메모를 입력하세요..."></textarea>
-        <button onclick="saveMemo()">저장</button>
+        <button id="btn-new-save" onclick="saveMemo()">저장</button>
         <ul id="memoList"></ul>
     </div>
     
 <template id="memoTemplate">
     <li>
-        <div class="memo_content"></div>
-        <div class="container_memolist">
-            <button class="btn_delete" data-id="">삭제</button>
-            <button class="btn_modify" data-id="">수정</button>
+        <div class="memo-content"></div>
+        <div class="container-memolist">
+            <button class="btn-delete" data-id="">삭제</button>
+            <button class="btn-modify" data-id="">수정</button>
         </div>
     </li>
 </template>
