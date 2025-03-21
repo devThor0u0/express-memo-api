@@ -129,7 +129,7 @@ async function loadMemos() {
 async function saveMemo() {
     const memoInput = document.getElementById("memo");
     const memo = memoInput.value.trim();
-    if (!memo || typeof memo) {
+    if (!memo || typeof memo == "undefined") {
         alert("메모값 입력은 필수입니다.");
         return;
     }
