@@ -1,123 +1,93 @@
-const apiUrl = "https://2395-220-74-13-231.ngrok-free.app";
+// 🚨 여기에 당신의 Railway 도메인 주소를 넣으세요!
+const apiUrl = "https://your-project-name.up.railway.app";
 
-$(function() {
-
-    // 초기화 함수
+$(function () {
     init();
-    
 });
 
-
 function init() {
-
     loadMemos();
 }
 
-
-$(document).on("click", ".btn_delete", function() {
+// 삭제 버튼 클릭 이벤트
+$(document).on("click", ".btn_delete", function () {
     const memoId = $(this).attr("data-id");
-    if(!memoId) return;
-
+    if (!memoId) return;
     deleteMemo(memoId);
 });
 
-
-// 메모로드
+// 메모 불러오기
 async function loadMemos() {
-
     const memoList = $("#memoList");
     memoList.empty();
 
     try {
-        const response = await fetch(apiUrl + "/api/get-memos");
-        if(response.ok) {
+        const response = await fetch(`${apiUrl}/api/get-memos`);
+        if (!response.ok) throw new Error("서버 오류");
 
-            const responseJson = await response.json();
+        const memos = await response.json();
 
-            responseJson.forEach(function(ele) {
-                if(ele) {
-                    
-                    let sHtml = "";
-                    let memoId = ele.id;
-                    let memoContent = ele.content;
+        memos.forEach((ele) => {
+            if (ele) {
+                const { id, content } = ele;
 
-                    sHtml += `<div class='memo-item' data-id='${memoId}'>`;
-                    sHtml += `   <div class='memo-content'>${memoContent}</div>`;
-                    sHtml += `   <div class='container-btn'>`;
-                    sHtml += `       <button class='btn_modify' data-id='${memoId}'>수정</button>`;
-                    sHtml += `       <button class='btn_delete' data-id='${memoId}'>삭제</button>`;
-                    sHtml += `   </div>`;
-                    sHtml += `</div>`;
-                    
-                    memoList.append(sHtml);
-                }
-            });
-        }
+                const sHtml = `
+                    <div class='memo-item' data-id='${id}'>
+                        <div class='memo-content'>${content}</div>
+                        <div class='container-btn'>
+                            <button class='btn_modify' data-id='${id}'>수정</button>
+                            <button class='btn_delete' data-id='${id}'>삭제</button>
+                        </div>
+                    </div>
+                `;
 
-
-    } catch (error) {
-        alert(`메모 불러오기 실패: ${console.error(error)} ${response.statusText}`);
-    }
-}
-
-
-// 메모저장
-async function saveMemo() {
-    const memoInput = document.getElementById('memo');
-    const memo = memoInput.value.trim();
-    if (memo) {
-        try {
-            const response = await fetch( apiUrl + '/api/save-memo', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ memo })
-            });
-            if (response.ok) {
-                memoInput.value = '';
-                loadMemos();
-            }
-        } catch (error) {
-            alert(`메모 저장 실패: ${console.error(error)} ${response.statusText}`);
-        }
-    }
-}
-
-
-
-
-
-async function deleteMemo(memoId) {
-
-
-        $.ajax({
-            url: `${apiUrl}/api/delete-memo`,
-            type: 'POST',
-            data: JSON.stringify({ memoId }),
-            contentType: 'application/json',
-            success: function(data) {
-                alert("메모가 삭제되었습니다.");
-                loadMemos();
-            },error: function(xhr, status, error) {
-                console.error('메모 삭제 오류:', error);
-                alert(`메모 삭제 중 오류 발생: ${error.message}`);
+                memoList.append(sHtml);
             }
         });
-    // try {
-    //     const response = await fetch(`${apiUrl}/api/delete-memo`, {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/json' },
-    //         body: JSON.stringify({ memoId })
-    //     });
+    } catch (error) {
+        console.error("메모 불러오기 실패:", error);
+        alert("❌ 메모를 불러오는 데 실패했습니다.");
+    }
+}
 
-    //     if (!response.ok) {
-    //         const errorText = await response.text();
-    //         throw new Error(`메모 삭제 실패: ${response.status} ${errorText}`);
-    //     }
+// 메모 저장
+async function saveMemo() {
+    const memoInput = document.getElementById("memo");
+    const memo = memoInput.value.trim();
+    if (!memo) return;
 
-    //     alert("메모가 삭제되었습니다.");
-    //     loadMemos(); // 삭제 후 메모 목록 다시 불러오기
-    // } catch (error) {
-    //     console.error('메모 삭제 오류:', error);
-    //     alert(`메모 삭제 중 오류 발생: ${error.message}`);
-    // }
+    try {
+        const response = await fetch(`${apiUrl}/api/save-memo`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ memo }),
+        });
+
+        if (!response.ok) throw new Error("서버 응답 오류");
+
+        memoInput.value = "";
+        loadMemos();
+    } catch (error) {
+        console.error("메모 저장 실패:", error);
+        alert("❌ 메모 저장에 실패했습니다.");
+    }
+}
+
+// 메모 삭제
+async function deleteMemo(memoId) {
+    try {
+        const response = await fetch(`${apiUrl}/api/delete-memo`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ memoId }),
+        });
+
+        if (!response.ok) throw new Error(`서버 응답 오류 (${response.status})`);
+
+        alert("🗑️ 메모가 삭제되었습니다.");
+        loadMemos();
+    } catch (error) {
+        console.error("메모 삭제 실패:", error);
+        alert("❌ 메모 삭제에 실패했습니다.");
+    }
 }
