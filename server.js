@@ -21,7 +21,7 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(express.static('public'));
 // ✅ "/api"로 시작하는 요청만 memoRoutes에서 처리
-app.use('/api', memoRoutes);
+
 
 // 그 외 요청은 404 처리
 app.use((req, res) => {
@@ -30,7 +30,7 @@ app.use((req, res) => {
 
 
 // ✅ 메모 불러오기
-app.get('/get-memos', async (req, res) => {
+app.get('/api/get-memos', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM memos ORDER BY id DESC');
     res.json(result.rows);
@@ -41,7 +41,7 @@ app.get('/get-memos', async (req, res) => {
 });
 
 // ✅ 메모 저장
-app.post('/save-memo', async (req, res) => {
+app.post('/api/save-memo', async (req, res) => {
   const { memo } = req.body;
   if (!memo) {
     return res.status(400).json({ error: '메모 내용이 없습니다.' });
@@ -58,7 +58,7 @@ app.post('/save-memo', async (req, res) => {
 
 
 // ✅ 메모 수정
-app.post('/edit-memo', async (req, res) => {
+app.post('/api/edit-memo', async (req, res) => {
 
     var params = JSON.parse(req.params);
 
@@ -92,7 +92,7 @@ app.post('/edit-memo', async (req, res) => {
 
 
 // ✅ 메모 삭제
-app.post('/delete-memo', async (req, res) => {
+app.post('/api/delete-memo', async (req, res) => {
   const { memoId } = req.body;
 
   if (!memoId) {
