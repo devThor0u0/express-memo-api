@@ -129,7 +129,10 @@ async function loadMemos() {
 async function saveMemo() {
     const memoInput = document.getElementById("memo");
     const memo = memoInput.val().trim();
-    if (!memo) return;
+    if (!memo || typeof memo) {
+        alert("메모값 입력은 필수입니다.");
+        return;
+    }
 
     try {
         const response = await fetch(`${apiUrl}/save-memo`, {
