@@ -1,5 +1,5 @@
 // 🚨 여기에 당신의 Railway 도메인 주소를 넣으세요!
-const apiUrl = "https://your-project-name.up.railway.app";
+const apiUrl = "https://express-memo-api-production.up.railway.app";
 
 $(function () {
     init();
