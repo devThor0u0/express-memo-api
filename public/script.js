@@ -128,7 +128,7 @@ async function loadMemos() {
 // 메모 저장
 async function saveMemo() {
     const memoInput = document.getElementById("memo");
-    const memo = memoInput.val().trim();
+    const memo = memoInput.value.trim();
     if (!memo || typeof memo) {
         alert("메모값 입력은 필수입니다.");
         return;
@@ -143,7 +143,7 @@ async function saveMemo() {
 
         if (!response.ok) throw new Error("서버 응답 오류");
 
-        memoInput.val("");
+        memoInput.value = "";
         loadMemos();
     } catch (error) {
         console.error("메모 저장 실패:", error);
