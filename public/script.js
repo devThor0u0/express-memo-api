@@ -18,7 +18,10 @@ $(document).on("click", ".btn-save", function () {
 
     const memoId = $(this).attr("data-id");
     const memoContent = $(this).closest(".memo-item").find(".memo-content-edit").val();
-    if (!memoId || !$.trim(memoContent)) return;
+    if (!memoId || typeof memoContent === "undefined" || !$.trim(memoContent)) {
+        alert("메모값 입력은 필수 입니다.");
+        return;
+    }
 
     editMemo(memoId, memoContent);
 });
