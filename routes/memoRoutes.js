@@ -1,49 +1,30 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
 const router = express.Router();
+const { Pool } = require('pg');
 
-// 📌 SQLite 데이터베이스 연결
-const db = new sqlite3.Database('./memos.db', (err) => {
-    if (err) console.error('❌ SQLite 연결 실패:', err.message);
-    else console.log('✅ SQLite 연결 성공');
+// PostgreSQL 연결
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:gxtKSiUloqcTQyWetpQmFpNntvYPeKpK@gondola.proxy.rlwy.net:10175/railway',
+  ssl: { rejectUnauthorized: false }
 });
 
-// 📌 메모 저장 API (POST 요청)
-router.post('/save-memo', (req, res) => {
-    const { memo } = req.body;
-    if (!memo) return res.status(400).json({ error: '메모 내용이 없습니다.' });
+// ✅ 메모 수정 라우트
+router.post('/edit-memo', async (req, res) => {
+  const { memoId, memoContent } = req.body;
 
-    db.run('INSERT INTO memos (content) VALUES (?)', [memo], function (err) {
-        if (err) return res.status(500).json({ error: err.message });
-        res.sendStatus(200);
-    });
+  if (!memoId || !memoContent || memoContent.trim() === '') {
+    return res.status(400).json({ error: '수정할 데이터가 없습니다.' });
+  }
+
+  try {
+    await pool.query('UPDATE memos SET content = $1 WHERE id = $2', [memoContent, memoId]);
+    res.sendStatus(200);
+  } catch (err) {
+    console.error('❌ 메모 수정 실패:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// 📌 저장된 메모 불러오기 API (GET 요청)
-router.get('/get-memos', (req, res) => {
-    db.all('SELECT * FROM memos ORDER BY id DESC', [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
-    });
-});
-
-// 📌 특정 메모 삭제 API (DELETE 요청)
-router.delete('/delete-memo/:id', (req, res) => {
-    const memoId = req.params.id;
-    db.run('DELETE FROM memos WHERE id = ?', [memoId], function (err) {
-        if (err) return res.status(500).json({ error: err.message });
-        res.sendStatus(200);
-    });
-});
-
-// 📌 특정 메모 수정 API (PUT 요청)
-router.put('/update-memo/:id', (req, res) => {
-    const memoId = req.params.id;
-    const { content } = req.body;
-    db.run('UPDATE memos SET content = ? WHERE id = ?', [content, memoId], function (err) {
-        if (err) return res.status(500).json({ error: err.message });
-        res.sendStatus(200);
-    });
-});
+// 다른 메모 관련 API도 여기에 추가 가능 (get-memos, save-memo, delete-memo 등)
 
 module.exports = router;

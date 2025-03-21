@@ -65,13 +65,13 @@ $(document).on("click", ".btn-delete", function () {
 
 async function isMemoInEditMode(memoId) {
 
-    if(!memo) return;
+    if(!memoId) return; // ✅ 'memo'가 아니라 'memoId' 체크해야 함
 
     const memoObj = $(".memo-item[data-id='" + memoId + "']");
     const editableFlag = memoObj.attr("data-editable");
 
-    $(".memo-item[data-id='" + memoId + "'] [data-editable]").each(function(idx, ele){
-        if($(ele).attr("data-editable") === editableFlag) {
+    memoObj.find("[data-editable]").each(function(idx, ele){
+        if($(ele).attr("data-editable") === "true") {
             $(ele).show();
         } else {
             $(ele).hide();
@@ -125,7 +125,7 @@ async function loadMemos() {
 // 메모 저장
 async function saveMemo() {
     const memoInput = document.getElementById("memo");
-    const memo = memoInput.value.trim();
+    const memo = memoInput.val().trim();
     if (!memo) return;
 
     try {
@@ -137,7 +137,7 @@ async function saveMemo() {
 
         if (!response.ok) throw new Error("서버 응답 오류");
 
-        memoInput.value = "";
+        memoInput.val("");
         loadMemos();
     } catch (error) {
         console.error("메모 저장 실패:", error);
@@ -155,7 +155,8 @@ async function editMemo(memoId, memoContent) {
     $.ajax({
         url: `${apiUrl}/edit-memo`,
         type: "POST",
-        data: params,
+        contentType: "application/json", // ✅ 서버가 JSON을 받도록 지정
+        data: JSON.stringify(params),
         success: function (response) {
             alert("✅ 메모가 수정되었습니다.");
             loadMemos();
